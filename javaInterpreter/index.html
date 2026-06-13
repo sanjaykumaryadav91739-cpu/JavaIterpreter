@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>OmniJS™ - Universal JavaScript Runtime Engine | Full Stack Enterprise Edition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-primary: #0f0f17;
+            --bg-surface: #151521;
+            --bg-elevated: #1a1a2a;
+            --bg-header: #1f1f2f;
+            --border-light: rgba(255,255,255,0.08);
+            --accent-primary: #6c5ce7;
+            --accent-secondary: #a855f7;
+            --accent-tertiary: #3b82f6;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        [data-theme="light"] {
+            --bg-deep: #f8f9fa;
+            --bg-primary: #ffffff;
+            --bg-surface: #f1f3f5;
+            --bg-elevated: #e9ecef;
+            --bg-header: #dee2e6;
+            --border-light: rgba(0,0,0,0.1);
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Professional Layout */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-light);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .badge {
+            background: var(--accent-primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 1px;
+            background: var(--border-light);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-primary);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-light);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .test-list {
+            flex: 1;
+        }
+
+        .test-item {
+            padding: 0.875rem 1rem;
+            margin: 0.25rem 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .test-item:hover {
+            background: var(--bg-elevated);
+            transform: translateX(4px);
+        }
+
+        .test-item.active {
+            background: var(--gradient-1);
+            color: white;
+        }
+
+        .test-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-surface);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .test-item.active .test-icon {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .test-info {
+            flex: 1;
+        }
+
+        .test-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .test-desc {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        /* Editor Area */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-surface);
+        }
+
+        .editor-toolbar {
+            background: var(--bg-elevated);
+            padding: 0.5rem 1rem;
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-header);
+            color: var(--text-primary);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .editor-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #codeEditor {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            padding: 1rem;
+            border: none;
+            outline: none;
+            resize: none;
+            line-height: 1.6;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: var(--bg-elevated);
+            padding: 0.5rem 1rem;
+            display: flex;
+            gap: 2rem;
+            border-top: 1px solid var(--border-light);
+            font-size: 0.75rem;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        /* Console Area */
+        .console-area {
+            height: 280px;
+            background: var(--bg-deep);
+            border-top: 2px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .console-header {
+            background: var(--bg-elevated);
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .console-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .console-tab {
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .console-tab.active {
+            background: var(--accent-primary);
+        }
+
+        .console-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.75rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+        }
+
+        .log-line {
+            padding: 0.25rem;
+            border-bottom: 1px solid var(--border-light);
+            font-family: monospace;
+        }
+
+        .log-info {
+            color: var(--info);
+        }
+
+        .log-success {
+            color: var(--success);
+        }
+
+        .log-error {
+            color: var(--error);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .log-warning {
+            color: var(--warning);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: var(--bg-elevated);
+            border-left: 4px solid var(--accent-primary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            .btn span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="logo-text">OmniJS™ Runtime</div>
+                <div class="badge">Enterprise v4.0</div>
+            </div>
+            <div class="toolbar">
+                <button class="btn btn-secondary" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i> <span>Theme</span>
+                </button>
+                <button class="btn btn-secondary" onclick="showDocs()">
+                    <i class="fas fa-book"></i> <span>Docs</span>
+                </button>
+                <button class="btn btn-danger" onclick="hardReset()">
+                    <i class="fas fa-trash"></i> <span>Reset</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <i class="fas fa-vial"></i> TEST SUITE
+                </div>
+                <div class="test-list">
+                    <div class="test-item active" data-test="tc1" onclick="loadTest('tc1')">
+                        <div class="test-icon"><i class="fas fa-calculator"></i></div>
+                        <div class="test-info">
+                            <div class="test-title">Odd/Even Checker</div>
+                            <div class="test-desc">Basic conditional logic</div>
+                        </div>
+                    </div>
+                    <div class="test-item" data-test="tc2" onclick="loadTest('tc2')">
+                        <div class="test-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="test-info">
+                            <div class="test-title">Triangle Pattern</div>
+                            <div class="test-desc">Nested loops</div>
+                        </div>
+                    </div>
+                    <div class="test-item" data-test="tc3" onclick="loadTest('tc3')">
+                        <div class="test-icon"><i class="fas fa-cube"></i></div>
+                        <div class="test-info">
+                            <div class="test-title">Armstrong Number</div>
+                            <div class="test-desc">Mathematical algorithm</div>
+                        </div>
+                    </div>
+                    <div class="test-item" data-test="tc4" onclick="loadTest('tc4')">
+                        <div class="test-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="test-info">
+                            <div class="test-title">Array Reverse</div>
+                            <div class="test-desc">Array operations</div>
+                        </div>
+                    </div>
+                    <div class="test-item" data-test="tc5" onclick="loadTest('tc5')">
+                        <div class="test-icon"><i class="fas fa-palindrome"></i></div>
+                        <div class="test-info">
+                            <div class="test-title">String Palindrome</div>
+                            <div class="test-desc">String manipulation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editor Area -->
+            <div class="editor-area">
+                <div class="editor-toolbar">
+                    <button class="btn btn-primary" onclick="executeCode()">
+                        <i class="fas fa-play"></i> <span>Execute (Ctrl+Enter)</span>
+                    </button>
+                    <button class="btn btn-success" onclick="formatCode()">
+                        <i class="fas fa-magic"></i> <span>Format</span>
+                    </button>
+                    <button class="btn btn-warning" onclick="saveCode()">
+                        <i class="fas fa-save"></i> <span>Save</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadCode()">
+                        <i class="fas fa-download"></i> <span>Export</span>
+                    </button>
+                </div>
+                <div class="editor-container">
+                    <textarea id="codeEditor" spellcheck="false"></textarea>
+                </div>
+                <div class="stats-bar">
+                    <div class="stat"><i class="fas fa-code"></i> Lines: <span class="stat-value" id="lineCount">0</span></div>
+                    <div class="stat"><i class="fas fa-font"></i> Chars: <span class="stat-value" id="charCount">0</span></div>
+                    <div class="stat"><i class="fas fa-clock"></i> Exec: <span class="stat-value" id="execTime">0 ms</span></div>
+                    <div class="stat"><i class="fas fa-chart-line"></i> Ops: <span class="stat-value" id="opCount">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Console Area -->
+        <div class="console-area">
+            <div class="console-header">
+                <div class="console-tabs">
+                    <div class="console-tab active" onclick="switchConsoleTab('output')">
+                        <i class="fas fa-terminal"></i> Output
+                    </div>
+                    <div class="console-tab" onclick="switchConsoleTab('test')">
+                        <i class="fas fa-check-circle"></i> Test Results
+                    </div>
+                    <div class="console-tab" onclick="switchConsoleTab('repl')">
+                        <i class="fas fa-keyboard"></i> REPL
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="clearConsole()" style="padding: 0.25rem 0.75rem;">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+            <div class="console-content" id="consoleContent">
+                <div class="log-line log-info">🚀 OmniJS Runtime Engine v4.0 Initialized</div>
+                <div class="log-line log-info">📦 Loaded Test Suite: 5 Core Tests</div>
+                <div class="log-line log-info">🎯 Ready to execute JavaScript code</div>
+                <div class="log-line log-info">💡 Press Ctrl+Enter or click Execute to run</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2>Documentation</h2>
+            <h3>Supported Features</h3>
+            <ul>
+                <li>ES6+ Syntax (let, const, arrow functions, destructuring)</li>
+                <li>Arrays & Array Methods (push, pop, map, filter, reduce, reverse)</li>
+                <li>Strings & String Methods (split, join, reverse, includes)</li>
+                <li>Objects & Classes</li>
+                <li>Control Flow (if/else, switch, loops)</li>
+                <li>Functions (regular, arrow, async/await)</li>
+                <li>Error Handling (try/catch)</li>
+                <li>Built-in Objects (Math, Date, JSON, console)</li>
+            </ul>
+            <h3>Test Cases</h3>
+            <ul>
+                <li><strong>TC1:</strong> Odd/Even Checker</li>
+                <li><strong>TC2:</strong> Triangle Pattern (nested loops)</li>
+                <li><strong>TC3:</strong> Armstrong Number (cubic sum)</li>
+                <li><strong>TC4:</strong> Array Reverse with spread operator</li>
+                <li><strong>TC5:</strong> String Palindrome Check</li>
+            </ul>
+            <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 1rem;">Close</button>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ============================================================================
+        // TEST CASE DATABASE
+        // ============================================================================
+        const TEST_CASES = {
+            tc1: {
+                name: "Odd/Even Checker",
+                code: `// Test Case 1: Odd/Even Checker
+function checkOddEven(num) {
+    if (num % 2 === 0) {
+        console.log(num + " is Even");
+    } else {
+        console.log(num + " is Odd");
+    }
+}
+
+// Test with multiple values
+console.log("=== Odd/Even Checker ===");
+checkOddEven(42);
+checkOddEven(17);
+checkOddEven(100);
+checkOddEven(99);
+
+// Additional test cases
+for(let i = 1; i <= 5; i++) {
+    checkOddEven(i);
+}`,
+                expected: ["42 is Even", "17 is Odd", "100 is Even", "99 is Odd", "1 is Odd", "2 is Even", "3 is Odd", "4 is Even", "5 is Odd"]
+            },
+            tc2: {
+                name: "Triangle Pattern",
+                code: `// Test Case 2: Triangle Pattern using Nested Loops
+console.log("=== Triangle Pattern ===");
+for (let i = 1; i <= 5; i++) {
+    let row = "";
+    for (let j = 1; j <= i; j++) {
+        row += "* ";
+    }
+    console.log(row);
+}
+
+// Bonus: Inverted triangle
+console.log("\\n=== Inverted Triangle ===");
+for (let i = 5; i >= 1; i--) {
+    let row = "";
+    for (let j = 1; j <= i; j++) {
+        row += "* ";
+    }
+    console.log(row);
+}`,
+                expected: []
+            },
+            tc3: {
+                name: "Armstrong Number",
+                code: `// Test Case 3: Armstrong Number Checker
+function isArmstrong(num) {
+    let temp = num;
+    let sum = 0;
+    const digits = num.toString().length;
+    
+    while (temp > 0) {
+        let digit = temp % 10;
+        sum += Math.pow(digit, digits);
+        temp = Math.floor(temp / 10);
+    }
+    return sum === num;
+}
+
+console.log("=== Armstrong Number Checker ===");
+console.log("153 is Armstrong:", isArmstrong(153));
+console.log("123 is Armstrong:", isArmstrong(123));
+console.log("370 is Armstrong:", isArmstrong(370));
+console.log("371 is Armstrong:", isArmstrong(371));
+console.log("407 is Armstrong:", isArmstrong(407));
+
+console.log("\\n=== Finding Armstrong numbers between 1-500 ===");
+for(let i = 1; i <= 500; i++) {
+    if(isArmstrong(i)) {
+        console.log(i + " is an Armstrong number");
+    }
+}`,
+                expected: []
+            },
+            tc4: {
+                name: "Array Reverse",
+                code: `// Test Case 4: Array Operations and Reverse
+console.log("=== Array Operations Demo ===");
+
+let arr = [1, 2, 3, 4, 5];
+console.log("Original array:", arr);
+
+// Method 1: Using spread operator and reverse
+let reversed = [...arr].reverse();
+console.log("Reversed (spread):", reversed);
+
+// Method 2: Using slice and reverse
+let reversed2 = arr.slice().reverse();
+console.log("Reversed (slice):", reversed2);
+
+// Method 3: Manual reversal
+let manualReverse = [];
+for(let i = arr.length - 1; i >= 0; i--) {
+    manualReverse.push(arr[i]);
+}
+console.log("Reversed (manual):", manualReverse);
+
+// Advanced array operations
+console.log("\\n=== Advanced Array Operations ===");
+let numbers = [10, 20, 30, 40, 50];
+console.log("Original:", numbers);
+console.log("Map (x2):", numbers.map(x => x * 2));
+console.log("Filter (>25):", numbers.filter(x => x > 25));
+console.log("Reduce (sum):", numbers.reduce((a,b) => a + b, 0));
+console.log("Join:", numbers.join(" - "));`,
+                expected: []
+            },
+            tc5: {
+                name: "String Palindrome",
+                code: `// Test Case 5: String Palindrome Checker
+function isPalindrome(str) {
+    // Remove non-alphanumeric and convert to lowercase
+    const clean = str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const reversed = clean.split('').reverse().join('');
+    return clean === reversed;
+}
+
+console.log("=== String Palindrome Checker ===");
+
+const testStrings = [
+    "racecar",
+    "hello",
+    "A man, a plan, a canal: panama",
+    "12321",
+    "Was it a car or a cat I saw?",
+    "No 'x' in Nixon"
+];
+
+testStrings.forEach(str => {
+    const result = isPalindrome(str);
+    console.log(\`"\${str}" is \${result ? "✓" : "✗"} a palindrome\`);
+});
+
+console.log("\\n=== Advanced String Operations ===");
+let text = "JavaScript is awesome!";
+console.log("Original:", text);
+console.log("Uppercase:", text.toUpperCase());
+console.log("Lowercase:", text.toLowerCase());
+console.log("Split:", text.split(" "));
+console.log("Contains 'Script':", text.includes("Script"));
+console.log("Starts with 'Java':", text.startsWith("Java"));
+console.log("Length:", text.length);`,
+                expected: []
+            }
+        };
+
+        // ============================================================================
+        // APPLICATION STATE
+        // ============================================================================
+        let currentTest = 'tc1';
+        let executionHistory = [];
+        let consoleOutput = [];
+        let testResults = {};
+        let replHistory = [];
+        let replIndex = -1;
+        let currentTab = 'output';
+
+        // ============================================================================
+        // CORE JAVASCRIPT INTERPRETER ENGINE
+        // ============================================================================
+        class JSRuntime {
+            constructor() {
+                this.context = {};
+                this.timers = {};
+                this.setupGlobals();
+            }
+
+            setupGlobals() {
+                // Console capture
+                this.logs = [];
+                
+                // Setup console object
+                this.context.console = {
+                    log: (...args) => {
+                        const output = args.map(arg => this.stringify(arg)).join(' ');
+                        this.logs.push({ type: 'info', content: output });
+                    },
+                    error: (...args) => {
+                        const output = args.map(arg => this.stringify(arg)).join(' ');
+                        this.logs.push({ type: 'error', content: output });
+                    },
+                    warn: (...args) => {
+                        const output = args.map(arg => this.stringify(arg)).join(' ');
+                        this.logs.push({ type: 'warning', content: output });
+                    },
+                    table: (data) => {
+                        this.logs.push({ type: 'info', content: JSON.stringify(data, null, 2) });
+                    },
+                    time: (label) => {
+                        this.timers[label] = Date.now();
+                    },
+                    timeEnd: (label) => {
+                        if (this.timers[label]) {
+                            const duration = Date.now() - this.timers[label];
+                            this.logs.push({ type: 'info', content: `${label}: ${duration}ms` });
+                            delete this.timers[label];
+                        }
+                    }
+                };
+
+                // Math object
+                this.context.Math = Math;
+                
+                // Date object
+                this.context.Date = Date;
+                
+                // JSON object
+                this.context.JSON = JSON;
+                
+                // Array methods
+                this.context.Array = Array;
+                
+                // String methods
+                this.context.String = String;
+                
+                // Global functions
+                this.context.parseInt = parseInt;
+                this.context.parseFloat = parseFloat;
+                this.context.isNaN = isNaN;
+                this.context.isFinite = isFinite;
+            }
+
+            stringify(value) {
+                if (value === undefined) return 'undefined';
+                if (value === null) return 'null';
+                if (typeof value === 'object') {
+                    try {
+                        return JSON.stringify(value);
+                    } catch(e) {
+                        return String(value);
+                    }
+                }
+                return String(value);
+            }
+
+            async execute(code) {
+                this.logs = [];
+                const startTime = performance.now();
+                
+                try {
+                    // Create a new Function with the code
+                    const asyncFn = new Function('context', `
+                        with(context) {
+                            ${code}
+                        }
+                    `);
+                    
+                    asyncFn(this.context);
+                    
+                    const execTime = performance.now() - startTime;
+                    
+                    return {
+                        success: true,
+                        logs: this.logs,
+                        executionTime: execTime,
+                        output: this.logs.map(l => l.content).join('\n')
+                    };
+                } catch (error) {
+                    const execTime = performance.now() - startTime;
+                    this.logs.push({
+                        type: 'error',
+                        content: `Runtime Error: ${error.message}\n${error.stack}`
+                    });
+                    
+                    return {
+                        success: false,
+                        logs: this.logs,
+                        executionTime: execTime,
+                        error: error.message,
+                        output: this.logs.map(l => l.content).join('\n')
+                    };
+                }
+            }
+        }
+
+        // Initialize runtime
+        const runtime = new JSRuntime();
+
+        // ============================================================================
+        // UI CONTROLLERS
+        // ============================================================================
+        
+        // Load test case
+        function loadTest(testId) {
+            currentTest = testId;
+            
+            // Update active state
+            document.querySelectorAll('.test-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-test="${testId}"]`).classList.add('active');
+            
+            // Load code into editor
+            const codeArea = document.getElementById('codeEditor');
+            codeArea.value = TEST_CASES[testId].code;
+            
+            updateStats();
+            showToast(`Loaded: ${TEST_CASES[testId].name}`, 'info');
+        }
+
+        // Execute current code
+        async function executeCode() {
+            const code = document.getElementById('codeEditor').value;
+            const startTime = performance.now();
+            
+            // Clear previous console for output tab only
+            if (currentTab === 'output') {
+                clearConsole();
+            }
+            
+            addToConsole('🚀 Executing code...', 'info');
+            
+            const result = await runtime.execute(code);
+            
+            // Display results
+            if (result.success) {
+                addToConsole('✅ Execution completed successfully', 'success');
+                result.logs.forEach(log => {
+                    addToConsole(log.content, log.type);
+                });
+            } else {
+                addToConsole('❌ Execution failed', 'error');
+                result.logs.forEach(log => {
+                    addToConsole(log.content, 'error');
+                });
+            }
+            
+            // Update stats
+            document.getElementById('execTime').innerHTML = `${result.executionTime.toFixed(2)} ms`;
+            document.getElementById('opCount').innerHTML = result.logs.length;
+            
+            // Store in history
+            executionHistory.push({
+                timestamp: new Date(),
+                code: code.substring(0, 200),
+                success: result.success,
+                executionTime: result.executionTime
+            });
+            
+            // Run test validation
+            validateAgainstExpected(result.logs);
+            
+            showToast(`Execution completed in ${result.executionTime.toFixed(2)}ms`, result.success ? 'success' : 'error');
+        }
+
+        // Validate against expected output
+        function validateAgainstExpected(logs) {
+            const testCase = TEST_CASES[currentTest];
+            const actualOutput = logs.map(l => l.content);
+            
+            let passed = true;
+            let failures = [];
+            
+            if (testCase.expected && testCase.expected.length > 0) {
+                for (let i = 0; i < testCase.expected.length; i++) {
+                    if (i < actualOutput.length) {
+                        if (!actualOutput[i].includes(testCase.expected[i])) {
+                            passed = false;
+                            failures.push(`Expected: "${testCase.expected[i]}", Got: "${actualOutput[i]}"`);
+                        }
+                    } else {
+                        passed = false;
+                        failures.push(`Missing output: "${testCase.expected[i]}"`);
+                    }
+                }
+            }
+            
+            testResults[currentTest] = {
+                passed,
+                failures,
+                timestamp: new Date(),
+                outputCount: logs.length
+            };
+            
+            // Update test results tab if active
+            if (currentTab === 'test') {
+                displayTestResults();
+            }
+        }
+
+        // Display test results
+        function displayTestResults() {
+            const consoleDiv = document.getElementById('consoleContent');
+            consoleDiv.innerHTML = '';
+            
+            addToConsole('=== TEST SUITE RESULTS ===', 'info');
+            
+            for (const [testId, result] of Object.entries(testResults)) {
+                const testName = TEST_CASES[testId]?.name || testId;
+                const status = result.passed ? '✅ PASSED' : '❌ FAILED';
+                const statusClass = result.passed ? 'success' : 'error';
+                
+                addToConsole(`${status} - ${testName}`, statusClass);
+                
+                if (result.failures && result.failures.length > 0) {
+                    result.failures.forEach(failure => {
+                        addToConsole(`  ⚠️ ${failure}`, 'warning');
+                    });
+                }
+                
+                addToConsole(`  📊 Output lines: ${result.outputCount}`, 'info');
+                addToConsole(`  🕐 Time: ${result.timestamp.toLocaleTimeString()}`, 'info');
+                addToConsole('', 'info');
+            }
+        }
+
+        // Format code
+        function formatCode() {
+            const editor = document.getElementById('codeEditor');
+            let code = editor.value;
+            let lines = code.split('\n');
+            let indentLevel = 0;
+            let formatted = [];
+            
+            for (let line of lines) {
+                let trimmed = line.trim();
+                if (trimmed === '') {
+                    formatted.push('');
+                    continue;
+                }
+                
+                if (trimmed === '}' || trimmed.startsWith('}')) {
+                    indentLevel = Math.max(0, indentLevel - 1);
+                }
+                
+                let indent = '    '.repeat(indentLevel);
+                formatted.push(indent + trimmed);
+                
+                if (trimmed === '{' || trimmed.endsWith('{')) {
+                    indentLevel++;
+                }
+            }
+            
+            editor.value = formatted.join('\n');
+            updateStats();
+            showToast('Code formatted successfully', 'success');
+        }
+
+        // Save code to localStorage
+        function saveCode() {
+            const code = document.getElementById('codeEditor').value;
+            localStorage.setItem(`saved_${currentTest}`, code);
+            showToast('Code saved to local storage', 'success');
+        }
+
+        // Download code
+        function downloadCode() {
+            const code = document.getElementById('codeEditor').value;
+            const blob = new Blob([code], {type: 'text/javascript'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${TEST_CASES[currentTest].name.toLowerCase().replace(/\s/g, '_')}.js`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Code downloaded', 'success');
+        }
+
+        // Update statistics
+        function updateStats() {
+            const code = document.getElementById('codeEditor').value;
+            const lines = code.split('\n').length;
+            const chars = code.length;
+            document.getElementById('lineCount').innerHTML = lines;
+            document.getElementById('charCount').innerHTML = chars;
+        }
+
+        // Add to console
+        function addToConsole(message, type = 'info') {
+            const consoleDiv = document.getElementById('consoleContent');
+            const logLine = document.createElement('div');
+            logLine.className = `log-line log-${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            logLine.innerHTML = `[${timestamp}] ${message}`;
+            
+            consoleDiv.appendChild(logLine);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            
+            // Store in history
+            consoleOutput.push({ message, type, timestamp });
+        }
+
+        // Clear console
+        function clearConsole() {
+            const consoleDiv = document.getElementById('consoleContent');
+            consoleDiv.innerHTML = '';
+            addToConsole('Console cleared', 'info');
+        }
+
+        // Switch console tab
+        function switchConsoleTab(tab) {
+            currentTab = tab;
+            
+            // Update active tab UI
+            document.querySelectorAll('.console-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Clear and load appropriate content
+            const consoleDiv = document.getElementById('consoleContent');
+            consoleDiv.innerHTML = '';
+            
+            if (tab === 'output') {
+                // Restore last console output
+                if (consoleOutput.length > 0) {
+                    consoleOutput.forEach(log => {
+                        const logLine = document.createElement('div');
+                        logLine.className = `log-line log-${log.type}`;
+                        logLine.innerHTML = `[${log.timestamp}] ${log.message}`;
+                        consoleDiv.appendChild(logLine);
+                    });
+                } else {
+                    addToConsole('No output yet. Execute some code!', 'info');
+                }
+            } else if (tab === 'test') {
+                displayTestResults();
+            } else if (tab === 'repl') {
+                addToConsole('=== REPL Mode ===', 'info');
+                addToConsole('Type JavaScript expressions below and press Enter', 'info');
+                addToConsole('Example: 2 + 2, "hello".toUpperCase(), [1,2,3].map(x => x*2)', 'info');
+                
+                // Create REPL input
+                const replInput = document.createElement('div');
+                replInput.style.display = 'flex';
+                replInput.style.marginTop = '1rem';
+                replInput.style.gap = '0.5rem';
+                replInput.innerHTML = `
+                    <span style="color: var(--accent-primary);">>>> </span>
+                    <input type="text" id="replInput" style="flex:1; background: var(--bg-surface); border: 1px solid var(--border-light); color: var(--text-primary); padding: 0.5rem; border-radius: 4px; font-family: monospace;" placeholder="Enter JavaScript expression...">
+                    <button class="btn btn-primary" onclick="evaluateREPL()" style="padding: 0.25rem 0.75rem;">Run</button>
+                `;
+                consoleDiv.appendChild(replInput);
+                
+                document.getElementById('replInput')?.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') evaluateREPL();
+                });
+            }
+        }
+
+        // Evaluate REPL expression
+        async function evaluateREPL() {
+            const input = document.getElementById('replInput');
+            const expression = input.value.trim();
+            
+            if (!expression) return;
+            
+            addToConsole(`>>> ${expression}`, 'info');
+            
+            const result = await runtime.execute(`console.log(${expression})`);
+            
+            if (result.success) {
+                result.logs.forEach(log => {
+                    if (!log.content.startsWith('undefined')) {
+                        addToConsole(log.content, 'success');
+                    }
+                });
+            } else {
+                addToConsole(`Error: ${result.error}`, 'error');
+            }
+            
+            input.value = '';
+            replHistory.push(expression);
+            replIndex = replHistory.length;
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.body.setAttribute('data-theme', newTheme);
+            showToast(`Switched to ${newTheme} theme`, 'info');
+        }
+
+        // Show documentation
+        function showDocs() {
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // Hard reset
+        function hardReset() {
+            if (confirm('This will clear all saved data and reset the application. Continue?')) {
+                localStorage.clear();
+                showToast('Application reset. Reloading...', 'warning');
+                setTimeout(() => location.reload(), 1000);
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+            toast.innerHTML = `${icon} ${message}`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                executeCode();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveCode();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                formatCode();
+            }
+        });
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            loadTest('tc1');
+            document.getElementById('codeEditor').addEventListener('input', updateStats);
+            updateStats();
+            
+            // Load saved code if exists
+            for (const testId of Object.keys(TEST_CASES)) {
+                const saved = localStorage.getItem(`saved_${testId}`);
+                if (saved) {
+                    TEST_CASES[testId].code = saved;
+                }
+            }
+            
+            showToast('OmniJS Runtime Engine Ready!', 'success');
+        });
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
